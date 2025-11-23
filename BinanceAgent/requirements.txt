@@ -2,12 +2,11 @@ python-dotenv==1.0.1
 requests==2.31.0
 
 # Google AI
-google-generativeai==0.8.3
+google-generativeai==0.8.5
 
-# LangChain
+# LangChain - Let pip resolve compatible versions
 langchain==0.3.14
-langchain-core==0.3.25
-langchain-google-genai==2.0.6
+langchain-google-genai==2.0.10
 
 # FastAPI
 fastapi==0.115.0
