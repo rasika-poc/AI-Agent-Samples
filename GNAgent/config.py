@@ -51,7 +51,7 @@ def get_mcp_server_configs() -> dict:
 
     For a server named <NAME>, set:
       MCP_<NAME>_URL=https://example.com/mcp
-      MCP_<NAME>_API_KEY=optional-bearer-token
+      MCP_<NAME>_API_KEY=optional-api-key (sent as X-API-Key header)
 
     Returns a dict keyed by lowercase server name, in the shape expected by
     langchain_mcp_adapters.client.MultiServerMCPClient.
@@ -70,7 +70,7 @@ def get_mcp_server_configs() -> dict:
             "transport": "streamable_http",
         }
         if api_key:
-            server_config["headers"] = {"Authorization": f"Bearer {api_key}"}
+            server_config["headers"] = {"X-API-Key": api_key}
 
         servers[name] = server_config
 

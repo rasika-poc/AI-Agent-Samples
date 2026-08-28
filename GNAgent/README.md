@@ -23,7 +23,7 @@ For each MCP server, set two env vars named after it:
 
 ```
 MCP_<NAME>_URL=https://your-mcp-server/endpoint
-MCP_<NAME>_API_KEY=optional-token      # sent as "Authorization: Bearer <key>"
+MCP_<NAME>_API_KEY=optional-token      # sent as an "X-API-Key" header
 ```
 
 Each distinct `<NAME>` becomes one server, and every tool it exposes is added to the
