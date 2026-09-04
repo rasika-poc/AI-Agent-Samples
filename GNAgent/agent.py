@@ -40,6 +40,7 @@ class GeneralAgent:
         base_llm = ChatOpenAI(
             model=settings.OPENAI_MODEL,
             api_key=settings.OPENAI_API_KEY,
+            base_url=settings.LLM_URL or None,
             temperature=0.3,
         )
         self.llm = base_llm.bind_tools(self.tools) if self.tools else base_llm

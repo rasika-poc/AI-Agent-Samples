@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     """Configuration for the General AI Agent"""
 
     # OpenAI Configuration
+    LLM_URL: str = ""
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4o-mini"
     EMBEDDING_MODEL: str = "text-embedding-3-small"
