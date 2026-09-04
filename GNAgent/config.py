@@ -15,7 +15,10 @@ class Settings(BaseSettings):
     """Configuration for the General AI Agent"""
 
     # OpenAI Configuration
+    # If LLM_URL is set, use it (with LLM_API_KEY) as an OpenAI-compatible gateway.
+    # Otherwise, fall back to calling OpenAI directly with OPENAI_API_KEY.
     LLM_URL: str = ""
+    LLM_API_KEY: str = ""
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4o-mini"
     EMBEDDING_MODEL: str = "text-embedding-3-small"
@@ -35,11 +38,15 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"  # MCP_<NAME>_URL / MCP_<NAME>_API_KEY are read directly from os.environ
 
     def validate_config(self):
         """Validate that all required configuration is present"""
-        if not self.OPENAI_API_KEY:
-            raise ValueError("Missing required configuration: OPENAI_API_KEY")
+        if not self.OPENAI_API_KEY and not (self.LLM_URL and self.LLM_API_KEY):
+            raise ValueError(
+                "Missing required configuration: set OPENAI_API_KEY, "
+                "or both LLM_URL and LLM_API_KEY"
+            )
         return True
 
 
