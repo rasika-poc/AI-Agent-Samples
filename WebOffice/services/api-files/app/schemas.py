@@ -21,6 +21,12 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
+class CurrentUserOut(BaseModel):
+    id: UUID
+    email: str
+    display_name: str
+
+
 class FolderCreate(BaseModel):
     name: str
     parent_id: Optional[UUID] = None
@@ -58,3 +64,36 @@ class FolderContents(BaseModel):
     folder: Optional[FolderOut]
     subfolders: list[FolderOut]
     files: list[FileOut]
+
+
+DOCUMENT_MIME_TYPE = "application/vnd.weboffice.document"
+
+
+class DocumentCreate(BaseModel):
+    name: str
+    folder_id: Optional[UUID] = None
+
+
+class DocumentOut(BaseModel):
+    id: UUID
+    folder_id: Optional[UUID]
+    name: str
+    owner_id: UUID
+    role: str  # the requesting user's resolved role, PLAN.md §5
+    created_at: datetime
+    updated_at: datetime
+
+
+class ShareRequest(BaseModel):
+    email: EmailStr
+    role: str  # viewer | commenter | editor — granting 'owner' isn't allowed via this endpoint
+
+
+class PermissionOut(BaseModel):
+    id: UUID
+    subject_type: str
+    subject_id: UUID
+    subject_email: Optional[str] = None
+    subject_display_name: Optional[str] = None
+    role: str
+    created_at: datetime

@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..config import settings
 from ..db import bootstrap_connection
-from ..schemas import LoginRequest, SignupRequest, TokenResponse
+from ..deps import CurrentUser, get_current_user
+from ..schemas import CurrentUserOut, LoginRequest, SignupRequest, TokenResponse
 from ..security import create_access_token, hash_password, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -91,3 +92,14 @@ async def login(body: LoginRequest) -> TokenResponse:
             role=membership["role"],
         )
         return TokenResponse(access_token=token)
+
+
+@router.get("/me", response_model=CurrentUserOut)
+async def me(current_user: CurrentUser = Depends(get_current_user)) -> CurrentUserOut:
+    async with bootstrap_connection() as conn:
+        row = await conn.fetchrow(
+            "SELECT id, email, display_name FROM users WHERE id = $1", current_user.user_id
+        )
+        if row is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "user not found")
+        return CurrentUserOut(**row)

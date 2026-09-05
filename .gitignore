@@ -1,0 +1,34 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Node
+node_modules/
+dist/
+build/
+
+# Env/secrets
+.env
+.env.local
+!.env.example
+
+# Logs
+*.log
+
+# Claude Code / Playwright MCP tooling output
+.playwright-mcp/
+
+# Stray screenshots dropped at the repo root by ad-hoc testing
+/*.png
+/*.jpg
+/*.jpeg

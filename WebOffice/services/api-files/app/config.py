@@ -24,6 +24,10 @@ class Settings(BaseSettings):
 
     max_upload_size_bytes: int = 25 * 1024 * 1024  # 25 MiB, Phase 0 default
 
+    # Comma-separated — the web frontend (services/web) runs on a different
+    # host port, so the browser treats it as a separate origin.
+    cors_origins: str = "http://localhost:48737"
+
     class Config:
         env_file = ".env"
 
