@@ -1,0 +1,83 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: weboffice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_dev_password
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "55432:5432" # host 5432 is already in use on this machine (dev-only remap)
+
+  redis:
+    # Not yet used by application code in Phase 0 — reserved for the Collab
+    # Server's cross-replica pub/sub in Phase 1 (PLAN.md §7/§9).
+    image: redis:7
+    volumes:
+      - redis-data:/data
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: weboffice
+      MINIO_ROOT_PASSWORD: weboffice_dev_secret
+    volumes:
+      - minio-data:/data # bind-mount a host path here instead for on-prem (PLAN.md §1)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "19000:9000" # host 9000 is already in use on this machine (dev-only remap)
+      - "19001:9001"
+
+  clamav:
+    # PLAN.md §22. First boot downloads the virus database (freshclam) and can
+    # take a few minutes — api-files retries/reports 503 until clamd is ready.
+    image: clamav/clamav:1.4
+    platform: linux/amd64 # no arm64 build published; runs under emulation on Apple Silicon
+    volumes:
+      - clamav-data:/var/lib/clamav
+    healthcheck:
+      test: ["CMD", "clamdcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 180s
+
+  api-files:
+    build: ./services/api-files
+    environment:
+      DATABASE_URL: postgresql://weboffice_app:weboffice_app_dev_password@postgres:5432/weboffice
+      JWT_SECRET: dev-only-change-me
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: weboffice
+      MINIO_SECRET_KEY: weboffice_dev_secret
+      MINIO_BUCKET: weboffice
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: "3310"
+      MALWARE_SCAN_ENABLED: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      clamav:
+        condition: service_started
+    ports:
+      - "18000:8000" # host 8000 is already in use on this machine (dev-only remap)
+
+volumes:
+  pg-data:
+  redis-data:
+  minio-data:
+  clamav-data:
