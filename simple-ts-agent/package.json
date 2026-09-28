@@ -1,0 +1,21 @@
+{
+  "name": "simple-ts-agent",
+  "version": "1.0.0",
+  "description": "A simple TypeScript AI agent with OpenAI, Tavily web search, and a current-date/time tool.",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "openai": "^4.68.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
